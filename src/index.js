@@ -4,10 +4,11 @@ const createStore = (reducer, initialState) => {
 
     const subscribe  = function (listener) {
       //can't compare objects, decided to convert to string and compare
-      listeners.push({
+      let subscriber = {
         key : listener.toString(),
         fun: listener
-      });       
+      }
+      listeners.push(subscriber);       
       
       return function() {
         let index = listeners.findIndex((val, i) => {
@@ -16,10 +17,7 @@ const createStore = (reducer, initialState) => {
         if(index !== -1){
           listeners.splice(index, 1);
         }else{ //just decided to allow resubscription
-          listeners.push({
-            key : listener.toString(),
-            fun: listener
-          });
+          listeners.push(subscriber);
         }
       };    
     }
