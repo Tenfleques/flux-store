@@ -3,13 +3,23 @@ const createStore = (reducer, initialState) => {
     let listeners = [];
 
     const subscribe  = function (listener) {
-      listeners.push(listener);      
+      //can't compare objects, decided to convert to string and compare
+      listeners.push({
+        key : listener.toString(),
+        fun: listener
+      });       
+      
       return function() {
         let index = listeners.findIndex((val, i) => {
-          return listener.toString() === val.toString(); //can't compare objects, decided to convert to string and compare
+          return listener.toString() === val.key; 
         });
         if(index !== -1){
           listeners.splice(index, 1);
+        }else{ //just decided to allow resubscription
+          listeners.push({
+            key : listener.toString(),
+            fun: listener
+          });
         }
       };    
     }
@@ -19,7 +29,7 @@ const createStore = (reducer, initialState) => {
     const dispatch = function(action) {
       state = reducer(state, action);
       for(var i = 0; i < listeners.length; ++i){
-        listeners[i]();
+        listeners[i].fun();
       }
     }
     return {
